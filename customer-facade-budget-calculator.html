@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Facade Budget Calculator for Customers — Demo</title>
+<style>
+  :root {
+    --bg: #f5f3ee; --card: #fffdf8; --text: #17201d; --muted: #68716d;
+    --line: #d8d7d0; --accent: #17201d; --soft: #efede6;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 16px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+  }
+  .wrap { width: min(760px, calc(100% - 32px)); margin: 42px auto; }
+  .header { margin-bottom: 22px; }
+  .eyebrow { color: var(--muted); font-size: 12px; font-weight: 750; letter-spacing: .11em; text-transform: uppercase; margin-bottom: 8px; }
+  h1 { margin: 0 0 10px; font-size: clamp(27px, 4vw, 36px); line-height: 1.15; letter-spacing: -.025em; }
+  .intro { color: var(--muted); margin: 0 0 9px; max-width: 650px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: clamp(20px, 4vw, 30px); box-shadow: 0 3px 14px rgba(0,0,0,.035); }
+  .field { margin-bottom: 22px; }
+  label, legend { display: block; font-weight: 700; margin-bottom: 8px; }
+  .hint { display: block; color: var(--muted); font-size: 13px; font-weight: 400; margin-top: 3px; }
+  input[type="number"], select {
+    display: block; width: 100%; min-height: 48px; border: 1px solid #d8d7d0;
+    border-radius: 9px; padding: 11px 13px; background: #fffdf8; color: var(--text);
+    font: inherit;
+  }
+  input:focus, select:focus { outline: 2px solid #888880; outline-offset: 2px; }
+  .unit-wrap { position: relative; }
+  .unit-wrap input { padding-right: 60px; }
+  .unit { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .reference { border-radius: 10px; padding: 12px 14px; background: var(--soft); color: var(--muted); font-size: 13px; margin: 2px 0 22px; }
+  .reference strong { color: var(--text); }
+  .result { margin-top: 20px; background: var(--accent); color: #fff; border-radius: 14px; padding: 22px 24px; }
+  .result-label { color: #d5d5d0; font-size: 14px; }
+  .price { font-size: clamp(36px, 7vw, 48px); line-height: 1.2; font-weight: 760; letter-spacing: -.035em; margin-top: 5px; font-variant-numeric: tabular-nums; }
+  .result-note { color: #d5d5d0; font-size: 12px; margin-top: 9px; }
+  .footer { color: var(--muted); font-size: 12px; margin: 15px 2px 0; }
+  @media (max-width: 560px) {
+    .wrap { margin: 24px auto; }
+    .grid { grid-template-columns: 1fr; gap: 0; }
+    .card { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header class="header">
+    <div class="eyebrow">FinEmal</div>
+    <h1>Facade Budget Calculator for Customers — Demo</h1>
+    <p class="intro">Do you know the approximate surface area of your project but aren't sure about the individual panel sizes? No worries! Use our calculator to get an estimated price for your project.</p>
+    <p class="intro">Simply enter the surface areas and select your product and colour to get an approximate budget for your facade project.</p>
+    <p class="intro"><strong>Please note:</strong> VAT, transportation and other additional costs are excluded. The prices shown are illustrative examples only and do not represent actual prices.</p>
+  </header>
+
+  <section class="card" aria-label="Facade budget inputs">
+    <div class="field">
+      <label for="standardArea">How many m² of the surface is standard panel or cassette?
+        <span class="hint">Straight standard pieces only — no corners or special cut-outs. Top, bottom and end pieces count as special pieces.</span>
+      </label>
+      <div class="unit-wrap">
+        <input id="standardArea" type="number" min="0" step="0.1" value="0" inputmode="decimal">
+        <span class="unit">m²</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="specialArea">How many m² of the surface require more work (special pieces)?
+        <span class="hint">For example, corners, special cut-outs, end pieces, and top and bottom pieces.</span>
+      </label>
+      <div class="unit-wrap">
+        <input id="specialArea" type="number" min="0" step="0.1" value="0" inputmode="decimal">
+        <span class="unit">m²</span>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="field">
+        <label for="product">Product</label>
+        <select id="product">
+          <option value="cassette">FinEmal cassette</option>
+          <option value="panel">FinEmal panel</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="colour">Colour</label>
+        <select id="colour">
+          <option value="standard">FinEmal Black</option>
+          <option value="standard">FinEmal White</option>
+          <option value="standard">FinEmal Grey</option>
+          <option value="standard">FinEmal Blue</option>
+          <option value="standard">FinEmal Green</option>
+          <option value="other">Other colour (+5%)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="reference"><strong>Reference size:</strong> 1,200 × 600 mm (0.72 m²). This size is used as the reference point for the budget estimate.</div>
+
+    <div class="result" aria-live="polite">
+      <div class="result-label">Estimated project budget</div>
+      <div class="price" id="budget">€0</div>
+      <div class="result-note">Indicative estimate only. Final pricing may vary depending on project details.</div>
+    </div>
+  </section>
+  <p class="footer">This estimate is intended as an initial budget indication and is not a quotation.</p>
+</main>
+
+<script>
+(() => {
+  const standardInput = document.getElementById('standardArea');
+  const specialInput = document.getElementById('specialArea');
+  const productInput = document.getElementById('product');
+  const colourInput = document.getElementById('colour');
+  const budgetOutput = document.getElementById('budget');
+
+  const money = value => new Intl.NumberFormat('en-IE', {
+    style: 'currency', currency: 'EUR', maximumFractionDigits: 0
+  }).format(value);
+
+  function areaValue(input) {
+    const value = Number(input.value);
+    return Number.isFinite(value) ? Math.max(0, value) : 0;
+  }
+
+  function calculate() {
+    const standardArea = areaValue(standardInput);
+    const specialArea = areaValue(specialInput);
+    const totalArea = standardArea + specialArea;
+    const isPanel = productInput.value === 'panel';
+    const isOtherColour = colourInput.value === 'other';
+
+    // Project-size adjustment is based on the combined area of the project.
+    let standardVolumeFactor = 1;
+    let specialVolumeFactor = 1;
+    if (totalArea < 100 && totalArea > 0) {
+      standardVolumeFactor = 1.20;
+      specialVolumeFactor = 1.15;
+    } else if (totalArea > 400) {
+      standardVolumeFactor = 0.85;
+      specialVolumeFactor = 0.90;
+    }
+
+    const productFactor = isPanel ? 1.10 : 1;
+    const standardCost = standardArea * 84 * productFactor * standardVolumeFactor;
+    const specialCost = specialArea * 84 * 1.30 * productFactor * specialVolumeFactor;
+    const colourFactor = isOtherColour ? 1.05 : 1;
+    const total = (standardCost + specialCost) * colourFactor;
+
+    budgetOutput.textContent = money(total);
+  }
+
+  [standardInput, specialInput, productInput, colourInput].forEach(input => {
+    input.addEventListener('input', calculate);
+    input.addEventListener('change', calculate);
+  });
+  calculate();
+})();
+</script>
+</body>
+</html>
